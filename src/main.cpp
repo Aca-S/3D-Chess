@@ -1,5 +1,4 @@
 #include <iostream>
-#include <cmath>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -286,6 +285,7 @@ int main() {
         modelShader.use();
         modelShader.setUniformMatrix4fv("view", view);
         modelShader.setUniformMatrix4fv("projection", projection);
+        modelShader.setUniform3fv("viewPosition", camera.Position);
 
         pawnBlack_1.draw(modelShader);
         pawnBlack_2.draw(modelShader);
