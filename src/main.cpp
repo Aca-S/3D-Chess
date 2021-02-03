@@ -10,6 +10,9 @@
 #include "../classes/Camera.h"
 #include "../classes/Model.h"
 #include "../classes/ChessFigure.h"
+#include "../classes/DirectionalLight.h"
+#include "../classes/PointLight.h"
+#include "../classes/SpotLight.h"
 
 void framebuffer_size_cb(GLFWwindow *window, int width, int height);
 void key_cb(GLFWwindow *window, int key, int scancode, int action, int mods);
@@ -28,18 +31,6 @@ bool firstMouse = true;
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
-
-// TODO: Implement a light class
-struct PointLight {
-    glm::vec3 position;
-    glm::vec3 ambient;
-    glm::vec3 diffuse;
-    glm::vec3 specular;
-
-    float constant;
-    float linear;
-    float quadratic;
-};
 
 int main() {
     glfwInit();
@@ -225,15 +216,23 @@ int main() {
     ChessFigure queenWhite(&queen, std::make_pair(3, 7), QUEEN, WHITE);
     ChessFigure kingWhite(&king, std::make_pair(4, 7), KING, WHITE);
 
+    DirectionalLight directionalLight(glm::vec3(0.0f, 3.0f, 0.0f),
+                                      glm::vec3(0.5, 0.1, 0.1),
+                                      glm::vec3(0.7f, 0.2f, 0.2f),
+                                      glm::vec3(1.0f, 0.2f, 0.2f));
 
-    PointLight pointLight;
-    pointLight.position = glm::vec3(0.0f, 3.0f, 0.0f);
-    pointLight.ambient = glm::vec3(0.4, 0.4, 0.2);
-    pointLight.diffuse = glm::vec3(0.6f, 0.5f, 0.6f);
-    pointLight.specular = glm::vec3(1.0f, 1.0f, 1.0f);
-    pointLight.constant = 1.0f;
-    pointLight.linear = 0.09f;
-    pointLight.quadratic = 0.032f;
+    PointLight pointLight(glm::vec3(0.0f, 3.0f, 0.0f),
+                          glm::vec3(0.4, 0.4, 0.2),
+                          glm::vec3(0.6f, 0.5f, 0.6f),
+                          glm::vec3(1.0f, 1.0f, 1.0f),
+                          1.0f, 0.09f, 0.032f);
+
+    SpotLight spotLight(glm::vec3(0.0f, 3.0f, 0.0f),
+                        glm::vec3(0.0f, -1.0f, 0.0f),
+                        glm::vec3(0.2, 0.2, 0.2),
+                        glm::vec3(0.0f, 0.7f, 0.0f),
+                        glm::vec3(1.0f, 1.0f, 1.0f),
+                        20.0f,1.0f, 0.09f, 0.032f);
 
     while(!glfwWindowShouldClose(window))
     {
@@ -322,13 +321,9 @@ int main() {
         queenWhite.draw(modelShader);
         kingWhite.draw(modelShader);
 
-        modelShader.setUniform3fv("pointLight.position", pointLight.position);
-        modelShader.setUniform3fv("pointLight.ambient", pointLight.ambient);
-        modelShader.setUniform3fv("pointLight.diffuse", pointLight.diffuse);
-        modelShader.setUniform3fv("pointLight.specular", pointLight.specular);
-        modelShader.setUniform1f("pointLight.constant", pointLight.constant);
-        modelShader.setUniform1f("pointLight.linear", pointLight.linear);
-        modelShader.setUniform1f("pointLight.quadratic", pointLight.quadratic);
+        pointLight.activate(modelShader);
+        directionalLight.activate(modelShader);
+        spotLight.activate(modelShader);
 
         glfwSwapBuffers(window);
     }
