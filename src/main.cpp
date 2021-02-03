@@ -12,6 +12,7 @@
 #include "../classes/DirectionalLight.h"
 #include "../classes/PointLight.h"
 #include "../classes/SpotLight.h"
+#include "../classes/Material.h"
 
 void framebuffer_size_cb(GLFWwindow *window, int width, int height);
 void key_cb(GLFWwindow *window, int key, int scancode, int action, int mods);
@@ -62,11 +63,11 @@ int main() {
     }
 
     float boardVertices[] = {
-            // Coords           Texture     Normals
-            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0, 0.0, 1.0, // bottom-left
-            0.5f, -0.5f, 0.0f,  4.0f, 0.0f, 0.0, 0.0, 1.0, // bottom-right
-            -0.5f, 0.5f, 0.0f,  0.0f, 4.0f, 0.0, 0.0, 1.0, // top-left
-            0.5f, 0.5f, 0.0f,   4.0f, 4.0f, 0.0, 0.0, 1.0  // top-right
+            // Coords           Normals        Texture
+            -0.5f, -0.5f, 0.0f, 0.0, 0.0, 1.0, 0.0f, 0.0f, // bottom-left
+            0.5f, -0.5f, 0.0f,  0.0, 0.0, 1.0, 4.0f, 0.0f, // bottom-right
+            -0.5f, 0.5f, 0.0f,  0.0, 0.0, 1.0, 0.0f, 4.0f, // top-left
+            0.5f, 0.5f, 0.0f,   0.0, 0.0, 1.0, 4.0f, 4.0f  // top-right
     };
 
     unsigned boardIndices[] = {
@@ -133,8 +134,8 @@ int main() {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(boardIndices), boardIndices, GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(5 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
 
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
@@ -171,6 +172,8 @@ int main() {
 
     Texture2D checkerDifTex("../resources/textures/chess_board_diffuse.jpg", DIFFUSE, GL_REPEAT, GL_LINEAR);
     Texture2D checkerSpecTex("../resources/textures/chess_board_specular.jpg", SPECULAR, GL_REPEAT, GL_LINEAR);
+
+    Material boardMaterial(&checkerDifTex, &checkerSpecTex, 32.0f);
 
     // TODO: Apply textures to models
     Model pawn("../resources/models/chess/pawn/pawn.obj");
@@ -216,21 +219,21 @@ int main() {
     ChessFigure kingWhite(&king, std::make_pair(4, 7), KING, WHITE);
 
     DirectionalLight directionalLight(glm::vec3(0.0f, 3.0f, 0.0f),
-                                      glm::vec3(0.5, 0.1, 0.1),
-                                      glm::vec3(0.7f, 0.2f, 0.2f),
-                                      glm::vec3(1.0f, 0.2f, 0.2f));
+                                      glm::vec3(0.1, 0.1, 0.1),
+                                      glm::vec3(0.3f, 0.3f, 0.3f),
+                                      glm::vec3(1.0f, 1.0f, 1.0f));
 
     PointLight pointLight(glm::vec3(0.0f, 3.0f, 0.0f),
-                          glm::vec3(0.4, 0.4, 0.2),
-                          glm::vec3(0.6f, 0.5f, 0.6f),
+                          glm::vec3(0.3, 0.3, 0.3),
+                          glm::vec3(0.6f, 0.6f, 0.6f),
                           glm::vec3(1.0f, 1.0f, 1.0f),
                           1.0f, 0.09f, 0.032f);
 
     SpotLight spotLight(glm::vec3(0.0f, 3.0f, 0.0f),
                         glm::vec3(0.0f, -1.0f, 0.0f),
-                        glm::vec3(0.2, 0.2, 0.2),
-                        glm::vec3(0.0f, 0.7f, 0.0f),
-                        glm::vec3(1.0f, 1.0f, 1.0f),
+                        glm::vec3(0.0, 0.0, 0.1),
+                        glm::vec3(0.0f, 0.0f, 1.0f),
+                        glm::vec3(0.0f, 0.0f, 1.0f),
                         20.0f,1.0f, 0.09f, 0.032f);
 
     while(!glfwWindowShouldClose(window))
@@ -258,15 +261,11 @@ int main() {
         boardShader.setUniformMatrix4fv("model", model);
         boardShader.setUniformMatrix4fv("view", view);
         boardShader.setUniformMatrix4fv("projection", projection);
-        checkerDifTex.active(GL_TEXTURE0);
-        boardShader.setUniform1i("material.diffuse", 0);
-        checkerSpecTex.active(GL_TEXTURE1);
-        boardShader.setUniform1i("material.specular", 1);
-        boardShader.setUniform3f("light.ambient", 0.2f, 0.2f, 0.2f);
-        boardShader.setUniform3f("light.diffuse", 0.8f, 0.8f, 0.8f);
-        boardShader.setUniform3f("light.specular", 1.0f, 1.0f, 1.0f);
-        boardShader.setUniform3f("light.position", 0.5f, 0.0f, 3.0f);
-        boardShader.setUniform3f("viewPosition", camera.Position.x, camera.Position.y, camera.Position.z);
+        boardMaterial.activate(boardShader);
+        pointLight.activate(boardShader);
+        directionalLight.activate(boardShader);
+        spotLight.activate(boardShader);
+        boardShader.setUniform3fv("viewPosition", camera.Position);
         glBindVertexArray(boardVAO);
         glDrawElements(GL_TRIANGLES, sizeof(boardIndices) / sizeof(unsigned), GL_UNSIGNED_INT, 0);
 

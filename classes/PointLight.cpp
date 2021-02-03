@@ -14,7 +14,7 @@ PointLight::PointLight(const glm::vec3 &position, const glm::vec3 &ambient, cons
     this->quadratic = quadratic;
 }
 
-void PointLight::activate(const Shader &shader) {
+void PointLight::activate(const Shader &shader) const {
     shader.setUniform3fv("pointLight.position", position);
     shader.setUniform3fv("pointLight.ambient", ambient);
     shader.setUniform3fv("pointLight.diffuse", diffuse);

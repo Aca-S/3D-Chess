@@ -1,5 +1,4 @@
 #version 330 core
-out vec4 FragColor;
 
 in vec3 FragPos;
 in vec2 TexCoords;
@@ -51,6 +50,8 @@ uniform PointLight pointLight;
 uniform SpotLight spotLight;
 
 uniform vec3 viewPosition;
+
+out vec4 FragColor;
 
 void main()
 {

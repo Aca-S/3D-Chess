@@ -12,7 +12,7 @@
 class DirectionalLight {
 public:
     DirectionalLight(const glm::vec3 &direction, const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular);
-    void activate(const Shader &shader);
+    void activate(const Shader &shader) const;
 
     glm::vec3 direction;
     glm::vec3 ambient;

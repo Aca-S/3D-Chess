@@ -11,7 +11,7 @@ DirectionalLight::DirectionalLight(const glm::vec3 &direction, const glm::vec3 &
     this->specular = specular;
 }
 
-void DirectionalLight::activate(const Shader &shader) {
+void DirectionalLight::activate(const Shader &shader) const {
     shader.setUniform3fv("directionalLight.direction", direction);
     shader.setUniform3fv("directionalLight.ambient", ambient);
     shader.setUniform3fv("directionalLight.diffuse", diffuse);

@@ -17,7 +17,7 @@ SpotLight::SpotLight(const glm::vec3 &position, const glm::vec3 &direction,
     this->linear = linear;
     this->quadratic = quadratic;
 }
-void SpotLight::activate(const Shader &shader) {
+void SpotLight::activate(const Shader &shader) const {
     shader.setUniform3fv("spotLight.position", position);
     shader.setUniform3fv("spotLight.direction", direction);
     shader.setUniform3fv("spotLight.ambient", ambient);
