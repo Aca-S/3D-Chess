@@ -173,7 +173,7 @@ int main() {
     Texture2D checkerDifTex("../resources/textures/chess_board_diffuse.jpg", DIFFUSE, GL_REPEAT, GL_LINEAR);
     Texture2D checkerSpecTex("../resources/textures/chess_board_specular.jpg", SPECULAR, GL_REPEAT, GL_LINEAR);
 
-    Material boardMaterial(&checkerDifTex, &checkerSpecTex, 32.0f);
+    Material boardMaterial(&checkerDifTex, &checkerSpecTex, 64.0f);
 
     // TODO: Apply textures to models
     Model pawn("../resources/models/chess/pawn/pawn.obj");
@@ -183,7 +183,6 @@ int main() {
     Model queen("../resources/models/chess/queen/queen.obj");
     Model king("../resources/models/chess/king/king.obj");
 
-    // TODO: Position the figures correctly along the y axis in the ChessFigure class
     ChessFigure pawnBlack_1(&pawn, std::make_pair(0, 1), PAWN, BLACK);
     ChessFigure pawnBlack_2(&pawn, std::make_pair(1, 1), PAWN, BLACK);
     ChessFigure pawnBlack_3(&pawn, std::make_pair(2, 1), PAWN, BLACK);
