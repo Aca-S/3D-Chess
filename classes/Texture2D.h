@@ -8,12 +8,23 @@
 #include <string>
 #include <glad/glad.h>
 
+enum texType {
+    DIFFUSE,
+    SPECULAR,
+    NORMAL,
+    HEIGHT
+};
+
 class Texture2D {
     unsigned tex_id;
+    texType tex_type;
 public:
-    Texture2D(const std::string &texturePath, GLenum filtering, GLenum sampling);
+    Texture2D(const std::string &texturePath, texType type, GLenum filtering, GLenum sampling);
     void active(GLenum e) const;
     void del();
+
+    texType getTextureType() const;
+    std::string getTextureTypeString() const;
 };
 
 

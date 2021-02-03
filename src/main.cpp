@@ -8,6 +8,8 @@
 #include "../classes/Shader.h"
 #include "../classes/Texture2D.h"
 #include "../classes/Camera.h"
+#include "../classes/Model.h"
+#include "../classes/ChessFigure.h"
 
 void framebuffer_size_cb(GLFWwindow *window, int width, int height);
 void key_cb(GLFWwindow *window, int key, int scancode, int action, int mods);
@@ -26,6 +28,18 @@ bool firstMouse = true;
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
+
+// TODO: Implement a light class
+struct PointLight {
+    glm::vec3 position;
+    glm::vec3 ambient;
+    glm::vec3 diffuse;
+    glm::vec3 specular;
+
+    float constant;
+    float linear;
+    float quadratic;
+};
 
 int main() {
     glfwInit();
@@ -163,9 +177,63 @@ int main() {
 
     Shader boardShader("../resources/shaders/board_vertex_shader.vs", "../resources/shaders/board_fragment_shader.fs");
     Shader lightcubeShader("../resources/shaders/lightcube_vertex_shader.vs", "../resources/shaders/lightcube_fragment_shader.fs");
+    Shader modelShader("../resources/shaders/chess_piece_vertex_shader.vs", "../resources/shaders/chess_piece_fragment_shader.fs");
 
-    Texture2D checkerDifTex("../resources/textures/chess_board_diffuse.jpg", GL_REPEAT, GL_LINEAR);
-    Texture2D checkerSpecTex("../resources/textures/chess_board_specular.jpg", GL_REPEAT, GL_LINEAR);
+    Texture2D checkerDifTex("../resources/textures/chess_board_diffuse.jpg", DIFFUSE, GL_REPEAT, GL_LINEAR);
+    Texture2D checkerSpecTex("../resources/textures/chess_board_specular.jpg", SPECULAR, GL_REPEAT, GL_LINEAR);
+
+    // TODO: Apply textures to models
+    Model pawn("../resources/models/chess/pawn/pawn.obj");
+    Model rook("../resources/models/chess/rook/rook.obj");
+    Model knight("../resources/models/chess/knight/knight.obj");
+    Model bishop("../resources/models/chess/bishop/bishop.obj");
+    Model queen("../resources/models/chess/queen/queen.obj");
+    Model king("../resources/models/chess/king/king.obj");
+
+    // TODO: Position the figures correctly along the y axis in the ChessFigure class
+    ChessFigure pawnBlack_1(&pawn, std::make_pair(0, 1), PAWN, BLACK);
+    ChessFigure pawnBlack_2(&pawn, std::make_pair(1, 1), PAWN, BLACK);
+    ChessFigure pawnBlack_3(&pawn, std::make_pair(2, 1), PAWN, BLACK);
+    ChessFigure pawnBlack_4(&pawn, std::make_pair(3, 1), PAWN, BLACK);
+    ChessFigure pawnBlack_5(&pawn, std::make_pair(4, 1), PAWN, BLACK);
+    ChessFigure pawnBlack_6(&pawn, std::make_pair(5, 1), PAWN, BLACK);
+    ChessFigure pawnBlack_7(&pawn, std::make_pair(6, 1), PAWN, BLACK);
+    ChessFigure pawnBlack_8(&pawn, std::make_pair(7, 1), PAWN, BLACK);
+    ChessFigure rookBlack_1(&rook, std::make_pair(0, 0), ROOK, BLACK);
+    ChessFigure rookBlack_2(&rook, std::make_pair(7, 0), ROOK, BLACK);
+    ChessFigure knightBlack_1(&knight, std::make_pair(1, 0), KNIGHT, BLACK);
+    ChessFigure knightBlack_2(&knight, std::make_pair(6, 0), KNIGHT, BLACK);
+    ChessFigure bishopBlack_1(&bishop, std::make_pair(2, 0), BISHOP, BLACK);
+    ChessFigure bishopBlack_2(&bishop, std::make_pair(5, 0), BISHOP, BLACK);
+    ChessFigure queenBlack(&queen, std::make_pair(3, 0), QUEEN, BLACK);
+    ChessFigure kingBlack(&king, std::make_pair(4, 0), KING, BLACK);
+
+    ChessFigure pawnWhite_1(&pawn, std::make_pair(0, 6), PAWN, WHITE);
+    ChessFigure pawnWhite_2(&pawn, std::make_pair(1, 6), PAWN, WHITE);
+    ChessFigure pawnWhite_3(&pawn, std::make_pair(2, 6), PAWN, WHITE);
+    ChessFigure pawnWhite_4(&pawn, std::make_pair(3, 6), PAWN, WHITE);
+    ChessFigure pawnWhite_5(&pawn, std::make_pair(4, 6), PAWN, WHITE);
+    ChessFigure pawnWhite_6(&pawn, std::make_pair(5, 6), PAWN, WHITE);
+    ChessFigure pawnWhite_7(&pawn, std::make_pair(6, 6), PAWN, WHITE);
+    ChessFigure pawnWhite_8(&pawn, std::make_pair(7, 6), PAWN, WHITE);
+    ChessFigure rookWhite_1(&rook, std::make_pair(0, 7), ROOK, WHITE);
+    ChessFigure rookWhite_2(&rook, std::make_pair(7, 7), ROOK, WHITE);
+    ChessFigure knightWhite_1(&knight, std::make_pair(1, 7), KNIGHT, WHITE);
+    ChessFigure knightWhite_2(&knight, std::make_pair(6, 7), KNIGHT, WHITE);
+    ChessFigure bishopWhite_1(&bishop, std::make_pair(2, 7), BISHOP, WHITE);
+    ChessFigure bishopWhite_2(&bishop, std::make_pair(5, 7), BISHOP, WHITE);
+    ChessFigure queenWhite(&queen, std::make_pair(3, 7), QUEEN, WHITE);
+    ChessFigure kingWhite(&king, std::make_pair(4, 7), KING, WHITE);
+
+
+    PointLight pointLight;
+    pointLight.position = glm::vec3(0.0f, 3.0f, 0.0f);
+    pointLight.ambient = glm::vec3(0.4, 0.4, 0.2);
+    pointLight.diffuse = glm::vec3(0.6f, 0.5f, 0.6f);
+    pointLight.specular = glm::vec3(1.0f, 1.0f, 1.0f);
+    pointLight.constant = 1.0f;
+    pointLight.linear = 0.09f;
+    pointLight.quadratic = 0.032f;
 
     while(!glfwWindowShouldClose(window))
     {
@@ -186,6 +254,9 @@ int main() {
 
         boardShader.use();
         model = glm::mat4(1.0);
+        model = glm::translate(model, glm::vec3(1.75f, 0.0f, 1.75f));
+        model = glm::rotate(model, (float)glm::radians(90.0), glm::vec3(1.0f, 0.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
         boardShader.setUniformMatrix4fv("model", model);
         boardShader.setUniformMatrix4fv("view", view);
         boardShader.setUniformMatrix4fv("projection", projection);
@@ -194,7 +265,7 @@ int main() {
         checkerSpecTex.active(GL_TEXTURE1);
         boardShader.setUniform1i("material.specular", 1);
         boardShader.setUniform3f("light.ambient", 0.2f, 0.2f, 0.2f);
-        boardShader.setUniform3f("light.diffuse", 0.5f, 0.5f, 0.5f);
+        boardShader.setUniform3f("light.diffuse", 0.8f, 0.8f, 0.8f);
         boardShader.setUniform3f("light.specular", 1.0f, 1.0f, 1.0f);
         boardShader.setUniform3f("light.position", 0.5f, 0.0f, 3.0f);
         boardShader.setUniform3f("viewPosition", camera.Position.x, camera.Position.y, camera.Position.z);
@@ -202,7 +273,8 @@ int main() {
         glDrawElements(GL_TRIANGLES, sizeof(boardIndices) / sizeof(unsigned), GL_UNSIGNED_INT, 0);
 
         lightcubeShader.use();
-        model = glm::translate(model, glm::vec3(0.5f, 0.0f, 3.0f)); // m * T
+        model = glm::mat4(1.0);
+        model = glm::translate(model, glm::vec3(0.0f, 3.0f, 0.0f)); // m * T
         model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f)); // m * T * R
         model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f)); // m * T * R * S
         lightcubeShader.setUniformMatrix4fv("model", model);
@@ -210,6 +282,53 @@ int main() {
         lightcubeShader.setUniformMatrix4fv("projection", projection);
         glBindVertexArray(cubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        // TODO: Move model to dedicated function
+        modelShader.use();
+        modelShader.setUniformMatrix4fv("view", view);
+        modelShader.setUniformMatrix4fv("projection", projection);
+
+        pawnBlack_1.draw(modelShader);
+        pawnBlack_2.draw(modelShader);
+        pawnBlack_3.draw(modelShader);
+        pawnBlack_4.draw(modelShader);
+        pawnBlack_5.draw(modelShader);
+        pawnBlack_6.draw(modelShader);
+        pawnBlack_7.draw(modelShader);
+        pawnBlack_8.draw(modelShader);
+        rookBlack_1.draw(modelShader);
+        rookBlack_2.draw(modelShader);
+        knightBlack_1.draw(modelShader);
+        knightBlack_2.draw(modelShader);
+        bishopBlack_1.draw(modelShader);
+        bishopBlack_2.draw(modelShader);
+        queenBlack.draw(modelShader);
+        kingBlack.draw(modelShader);
+
+        pawnWhite_1.draw(modelShader);
+        pawnWhite_2.draw(modelShader);
+        pawnWhite_3.draw(modelShader);
+        pawnWhite_4.draw(modelShader);
+        pawnWhite_5.draw(modelShader);
+        pawnWhite_6.draw(modelShader);
+        pawnWhite_7.draw(modelShader);
+        pawnWhite_8.draw(modelShader);
+        rookWhite_1.draw(modelShader);
+        rookWhite_2.draw(modelShader);
+        knightWhite_1.draw(modelShader);
+        knightWhite_2.draw(modelShader);
+        bishopWhite_1.draw(modelShader);
+        bishopWhite_2.draw(modelShader);
+        queenWhite.draw(modelShader);
+        kingWhite.draw(modelShader);
+
+        modelShader.setUniform3fv("pointLight.position", pointLight.position);
+        modelShader.setUniform3fv("pointLight.ambient", pointLight.ambient);
+        modelShader.setUniform3fv("pointLight.diffuse", pointLight.diffuse);
+        modelShader.setUniform3fv("pointLight.specular", pointLight.specular);
+        modelShader.setUniform1f("pointLight.constant", pointLight.constant);
+        modelShader.setUniform1f("pointLight.linear", pointLight.linear);
+        modelShader.setUniform1f("pointLight.quadratic", pointLight.quadratic);
 
         glfwSwapBuffers(window);
     }
@@ -259,8 +378,7 @@ void key_cb(GLFWwindow *window, int key, int scancode, int action, int mods) {
         glClearColor(0.0, 0.0, 1.0, 1.0);
 }
 
-void mouse_callback(GLFWwindow* window, double xpos, double ypos)
-{
+void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
     if (firstMouse)
     {
         lastX = xpos;
@@ -269,7 +387,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     }
 
     float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+    float yoffset = lastY - ypos;
 
     lastX = xpos;
     lastY = ypos;
@@ -277,10 +395,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
-// glfw: whenever the mouse scroll wheel scrolls, this callback is called
-// ----------------------------------------------------------------------
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-{
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
     camera.ProcessMouseScroll(yoffset);
 }
 

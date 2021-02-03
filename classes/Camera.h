@@ -2,6 +2,8 @@
 // Created by aca on 31.1.21..
 //
 
+// TODO: Rewrite the camera class (put implementations in .cpp file)
+
 #ifndef RG_3D_SAH_CAMERA_H
 #define RG_3D_SAH_CAMERA_H
 

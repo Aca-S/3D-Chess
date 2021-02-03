@@ -9,7 +9,8 @@
 
 #include "error.h"
 
-Texture2D::Texture2D(const std::string &texturePath, GLenum filtering, GLenum sampling) {
+Texture2D::Texture2D(const std::string &texturePath, texType type, GLenum filtering, GLenum sampling) {
+    tex_type = type;
     glGenTextures(1, &tex_id);
     glBindTexture(GL_TEXTURE_2D, tex_id);
 
@@ -26,6 +27,9 @@ Texture2D::Texture2D(const std::string &texturePath, GLenum filtering, GLenum sa
 
     switch(nChannels)
     {
+        case 1:
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, data);
+            break;
         case 3:
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
             break;
@@ -48,4 +52,26 @@ void Texture2D::active(GLenum e) const {
 void Texture2D::del() {
     glDeleteTextures(1, &tex_id);
     tex_id = -1;
+}
+
+texType Texture2D::getTextureType() const {
+    return tex_type;
+}
+
+std::string Texture2D::getTextureTypeString() const {
+    switch(tex_type)
+    {
+        case DIFFUSE:
+            return "texture_diffuse";
+            break;
+        case SPECULAR:
+            return "texture_specular";
+            break;
+        case NORMAL:
+            return "texture_normal";
+            break;
+        case HEIGHT:
+            return "texture_height";
+            break;
+    }
 }

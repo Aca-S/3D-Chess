@@ -26,6 +26,8 @@ public:
     void setUniform3i(const std::string &uniformName, int x, int y, int z) const;
     void setUniform4i(const std::string &uniformName, int x, int y, int z, int w) const;
 
+    void setUniform3fv(const std::string &uniformName, const glm::vec3 &vector) const;
+
     void setUniformMatrix4fv(const std::string &uniformName, const glm::mat4 &matrix) const;
 };
 
