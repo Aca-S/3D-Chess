@@ -297,6 +297,7 @@ int main() {
         model = glm::mat4(1.0);
         model = glm::translate(model, glm::vec3(1.75f, 0.0f, 1.75f));
         model = glm::rotate(model, (float)glm::radians(270.0), glm::vec3(1.0f, 0.0f, 0.0f));
+        model = glm::rotate(model, (float)glm::radians(90.0), glm::vec3(0.0f, 0.0f, 1.0f));
         model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
         boardShader.setUniformMatrix4fv("model", model);
         boardShader.setUniformMatrix4fv("view", view);
