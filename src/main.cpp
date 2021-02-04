@@ -18,7 +18,6 @@ void framebuffer_size_cb(GLFWwindow *window, int width, int height);
 void key_cb(GLFWwindow *window, int key, int scancode, int action, int mods);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-void update(GLFWwindow *window);
 void processInput(GLFWwindow *window);
 
 const unsigned int SCR_WIDTH = 800;
@@ -102,7 +101,7 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow *window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Vezba", nullptr, nullptr);
+    GLFWwindow *window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "3D Chess Scene", nullptr, nullptr);
     if(window == nullptr)
     {
         std::cerr << "Window creation failed" << std::endl;
@@ -235,7 +234,7 @@ int main() {
     Texture2D checkerDifTex("../resources/textures/chess_board_diffuse.jpg", DIFFUSE, GL_REPEAT, GL_LINEAR);
     Texture2D checkerSpecTex("../resources/textures/chess_board_specular.jpg", SPECULAR, GL_REPEAT, GL_LINEAR);
 
-    Material boardMaterial(&checkerDifTex, &checkerSpecTex, 64.0f);
+    Material boardMaterial(&checkerDifTex, &checkerSpecTex, 256.0f);
 
     DirectionalLight directionalLight(glm::vec3(1.75f, 3.0f, 1.75f),
                                       glm::vec3(0.1, 0.1, 0.1),
@@ -274,7 +273,7 @@ int main() {
         view = glm::lookAt(camera.Position, camera.Position + camera.Front, camera.Up);
         projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / SCR_HEIGHT, 0.1f, 100.0f);
 
-        float lightSpeedReduction = 1;
+        float lightSpeedReduction = 5;
 
         lightcubeShader.use();
         model = glm::mat4(1.0);
@@ -442,8 +441,4 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
     camera.ProcessMouseScroll(yoffset);
-}
-
-void update(GLFWwindow *window) {
-
 }
