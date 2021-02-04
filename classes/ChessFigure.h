@@ -22,12 +22,18 @@ enum color {
     WHITE
 };
 
+enum status {
+    INACTIVE,
+    ACTIVE
+};
+
 class ChessFigure {
     type figure_type;
     color figure_color;
 public:
     Model *model;
     std::pair<int, int> position; // [0][0] is top left of the board
+    status figure_status = INACTIVE;
     ChessFigure(Model *model, std::pair<int, int> position, type figure_type, color figure_color);
     void draw(Shader &shader);
 };

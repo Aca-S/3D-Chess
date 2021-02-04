@@ -39,10 +39,17 @@ void ChessFigure::draw(Shader &shader) {
             elevation = 0.33f;
             break;
     }
+    if(figure_status == ACTIVE)
+        elevation += 0.5f;
     model = glm::translate(model, glm::vec3(position.first * 0.5, elevation, position.second * 0.5));
     // If the color is white, rotate the figures 180 degrees (don't want the knights from both players facing the same direction)
     if(figure_color == WHITE)
+    {
         model = glm::rotate(model, (float)glm::radians(180.0), glm::vec3(0.0f, 1.0f, 0.0f));
+        shader.setUniform3fv("color", glm::vec3(1.0, 1.0, 1.0));
+    }
+    else
+        shader.setUniform3fv("color", glm::vec3(0.15, 0.15, 0.15));
     model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));
     shader.setUniformMatrix4fv("model", model);
     this->model->draw(shader);
