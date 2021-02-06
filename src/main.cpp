@@ -9,10 +9,12 @@
 #include "../classes/Camera.h"
 #include "../classes/Model.h"
 #include "../classes/ChessFigure.h"
+#include "../classes/ChessBoard.h"
 #include "../classes/DirectionalLight.h"
 #include "../classes/PointLight.h"
 #include "../classes/SpotLight.h"
 #include "../classes/Material.h"
+#include "../classes/Cube.h"
 
 void framebuffer_size_cb(GLFWwindow *window, int width, int height);
 void key_cb(GLFWwindow *window, int key, int scancode, int action, int mods);
@@ -23,7 +25,8 @@ void processInput(GLFWwindow *window);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-Camera camera(glm::vec3(3.0f, 2.0f, 4.0f));
+Camera camera(glm::vec3(1.75f, 3.0f, 7.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, -30.0f);
+
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -34,7 +37,7 @@ float lastFrame = 0.0f;
 ChessFigure *chessBoard[8][8];
 ChessFigure *currentlyActive = nullptr;
 std::pair<int, int> currentlyActiveRealPos;
-std::pair<int, int> boardCursor = std::make_pair(0, 1);
+std::pair<int, int> boardCursor = std::make_pair(6, 1);
 
 void createChessBoard() {
     Model *pawn = new Model("../resources/models/chess/pawn/pawn.obj");
@@ -123,110 +126,6 @@ int main() {
         return -1;
     }
 
-    float boardVertices[] = {
-            // Coords           Normals        Texture
-            -0.5f, -0.5f, 0.0f, 0.0, 0.0, 1.0, 0.0f, 0.0f, // bottom-left
-            0.5f, -0.5f, 0.0f,  0.0, 0.0, 1.0, 4.0f, 0.0f, // bottom-right
-            -0.5f, 0.5f, 0.0f,  0.0, 0.0, 1.0, 0.0f, 4.0f, // top-left
-            0.5f, 0.5f, 0.0f,   0.0, 0.0, 1.0, 4.0f, 4.0f  // top-right
-    };
-
-    unsigned boardIndices[] = {
-            0, 1, 2,
-            1, 2, 3
-    };
-
-    float cubeVertices[] = {
-            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-            0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-            0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-            0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-            -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-
-            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-            0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-            0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-            0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-            -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-
-            -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-            -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-            -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-            -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-            -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-            -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-
-            0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-            0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-            0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-            0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-            0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-            0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-
-            -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-            0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-            0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-            0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-            -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-
-            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-            0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-            0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-            0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-            -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
-    };
-
-    unsigned int boardVBO, boardVAO, boardEBO;
-
-    glGenVertexArrays(1, &boardVAO);
-    glBindVertexArray(boardVAO);
-
-    glGenBuffers(1, &boardVBO);
-    glGenBuffers(1, &boardEBO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, boardVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(boardVertices), boardVertices, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, boardEBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(boardIndices), boardIndices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
-
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-    glEnableVertexAttribArray(2);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-
-    unsigned int cubeVBO, cubeVAO;
-
-    glGenVertexArrays(1, &cubeVAO);
-    glBindVertexArray(cubeVAO);
-
-    glGenBuffers(1, &cubeVBO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
-
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    glEnable(GL_DEPTH_TEST);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-
     Shader boardShader("../resources/shaders/board_vertex_shader.vs", "../resources/shaders/board_fragment_shader.fs");
     Shader lightcubeShader("../resources/shaders/lightcube_vertex_shader.vs", "../resources/shaders/lightcube_fragment_shader.fs");
     Shader modelShader("../resources/shaders/chess_piece_vertex_shader.vs", "../resources/shaders/chess_piece_fragment_shader.fs");
@@ -254,6 +153,9 @@ int main() {
                         glm::vec3(1.0f, 1.0f, 1.0f),
                         7.5f,1.0f, 0.09f, 0.032f);
 
+    Cube cubeSource;
+    ChessBoard board;
+
     createChessBoard();
 
     while(!glfwWindowShouldClose(window))
@@ -276,15 +178,14 @@ int main() {
         float lightSpeedReduction = 5;
 
         lightcubeShader.use();
+        lightcubeShader.setUniformMatrix4fv("view", view);
+        lightcubeShader.setUniformMatrix4fv("projection", projection);
         model = glm::mat4(1.0);
         model = glm::translate(model, glm::vec3(1.75f + 3.0 * cos(glfwGetTime() / lightSpeedReduction), 3.0f, 1.75f + 3.0 * sin(glfwGetTime() / lightSpeedReduction))); // m * T
         model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f)); // m * T * R
         model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f)); // m * T * R * S
         lightcubeShader.setUniformMatrix4fv("model", model);
-        lightcubeShader.setUniformMatrix4fv("view", view);
-        lightcubeShader.setUniformMatrix4fv("projection", projection);
-        glBindVertexArray(cubeVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        cubeSource.draw();
 
         pointLight.position = glm::vec3(1.75 + 3.0f * cos(glfwGetTime() / lightSpeedReduction), 3.0f, 1.75 + 3.0f * sin(glfwGetTime() / lightSpeedReduction));
 
@@ -293,21 +194,20 @@ int main() {
         spotLight.diffuse = glm::vec3((sin(glfwGetTime()) + 1) / 2, 0.5, 0.1);
 
         boardShader.use();
+        boardShader.setUniformMatrix4fv("view", view);
+        boardShader.setUniformMatrix4fv("projection", projection);
+        boardShader.setUniform3fv("viewPosition", camera.Position);
         model = glm::mat4(1.0);
         model = glm::translate(model, glm::vec3(1.75f, 0.0f, 1.75f));
         model = glm::rotate(model, (float)glm::radians(270.0), glm::vec3(1.0f, 0.0f, 0.0f));
         model = glm::rotate(model, (float)glm::radians(90.0), glm::vec3(0.0f, 0.0f, 1.0f));
         model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
         boardShader.setUniformMatrix4fv("model", model);
-        boardShader.setUniformMatrix4fv("view", view);
-        boardShader.setUniformMatrix4fv("projection", projection);
         boardMaterial.activate(boardShader);
         pointLight.activate(boardShader);
         directionalLight.activate(boardShader);
         spotLight.activate(boardShader);
-        boardShader.setUniform3fv("viewPosition", camera.Position);
-        glBindVertexArray(boardVAO);
-        glDrawElements(GL_TRIANGLES, sizeof(boardIndices) / sizeof(unsigned), GL_UNSIGNED_INT, 0);
+        board.draw();
 
         modelShader.use();
         modelShader.setUniformMatrix4fv("view", view);
@@ -321,9 +221,8 @@ int main() {
         glfwSwapBuffers(window);
     }
 
-    glDeleteVertexArrays(1, &boardVAO);
-    glDeleteBuffers(1, &boardVBO);
-    glDeleteBuffers(1, &boardEBO);
+    cubeSource.del();
+    board.del();
 
     checkerDifTex.del();
     checkerSpecTex.del();
