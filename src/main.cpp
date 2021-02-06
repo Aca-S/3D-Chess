@@ -15,6 +15,7 @@
 #include "../classes/SpotLight.h"
 #include "../classes/Material.h"
 #include "../classes/Cube.h"
+#include "../classes/Skybox.h"
 
 void framebuffer_size_cb(GLFWwindow *window, int width, int height);
 void key_cb(GLFWwindow *window, int key, int scancode, int action, int mods);
@@ -129,6 +130,7 @@ int main() {
     Shader boardShader("../resources/shaders/board_vertex_shader.vs", "../resources/shaders/board_fragment_shader.fs");
     Shader lightcubeShader("../resources/shaders/lightcube_vertex_shader.vs", "../resources/shaders/lightcube_fragment_shader.fs");
     Shader modelShader("../resources/shaders/chess_piece_vertex_shader.vs", "../resources/shaders/chess_piece_fragment_shader.fs");
+    Shader skyboxShader("../resources/shaders/skybox.vs", "../resources/shaders/skybox.fs");
 
     Texture2D checkerDifTex("../resources/textures/chess_board_diffuse.jpg", DIFFUSE, GL_REPEAT, GL_LINEAR);
     Texture2D checkerSpecTex("../resources/textures/chess_board_specular.jpg", SPECULAR, GL_REPEAT, GL_LINEAR);
@@ -153,6 +155,18 @@ int main() {
                         glm::vec3(1.0f, 1.0f, 1.0f),
                         7.5f,1.0f, 0.09f, 0.032f);
 
+    std::vector<std::string> skyboxFaces = {
+            "../resources/skybox/right.jpg",
+            "../resources/skybox/left.jpg",
+            "../resources/skybox/top.jpg",
+            "../resources/skybox/bottom.jpg",
+            "../resources/skybox/front.jpg",
+            "../resources/skybox/back.jpg",
+    };
+    Skybox skybox(skyboxFaces);
+    skyboxShader.use();
+    skyboxShader.setUniform1i("skybox", 0);
+
     Cube cubeSource;
     ChessBoard board;
 
@@ -176,7 +190,6 @@ int main() {
         projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / SCR_HEIGHT, 0.1f, 100.0f);
 
         float lightSpeedReduction = 5;
-
         lightcubeShader.use();
         lightcubeShader.setUniformMatrix4fv("view", view);
         lightcubeShader.setUniformMatrix4fv("projection", projection);
@@ -218,17 +231,29 @@ int main() {
         spotLight.activate(modelShader);
         drawChessBoard(modelShader);
 
+        glDepthMask(GL_FALSE);
+        glDepthFunc(GL_LEQUAL);
+        skyboxShader.use();
+        skyboxShader.setUniformMatrix4fv("view", glm::mat4(glm::mat3(view)));
+        skyboxShader.setUniformMatrix4fv("projection", projection);
+        skybox.draw();
+        glDepthMask(GL_TRUE);
+        glDepthFunc(GL_LESS);
+
         glfwSwapBuffers(window);
     }
 
     cubeSource.del();
     board.del();
+    skybox.del();
 
     checkerDifTex.del();
     checkerSpecTex.del();
 
     boardShader.del();
     lightcubeShader.del();
+    modelShader.del();
+    skyboxShader.del();
 
     destroyChessBoard();
 
