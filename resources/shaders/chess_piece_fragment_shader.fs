@@ -69,10 +69,8 @@ void main()
 vec3 calcDirectionalLight(DirectionalLight light, vec3 normal, vec3 fragPos, vec3 viewDir) {
     vec3 lightDir = normalize(-light.direction);
     float diff = max(dot(normal, lightDir), 0.0);
-    //vec3 reflectDir = reflect(-lightDir, normal);
     vec3 halfwayDir = normalize(viewDir + lightDir);
     float spec = pow(max(dot(halfwayDir, normal), 0), 256.0);
-    //float spec = pow(max(dot(viewDir, reflectDir), 0.0), 64.0);
 
     vec3 ambient = light.ambient * Color;
     vec3 diffuse = light.diffuse * diff * Color;
@@ -84,10 +82,8 @@ vec3 calcDirectionalLight(DirectionalLight light, vec3 normal, vec3 fragPos, vec
 vec3 calcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir) {
     vec3 lightDir = normalize(light.position - fragPos);
     float diff = max(dot(normal, lightDir), 0.0);
-    //vec3 reflectDir = reflect(-lightDir, normal);
     vec3 halfwayDir = normalize(viewDir + lightDir);
     float spec = pow(max(dot(halfwayDir, normal), 0), 256.0);
-    //float spec = pow(max(dot(viewDir, reflectDir), 0.0), 64.0);
     float distance = length(light.position - fragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * distance * distance);
 
@@ -109,10 +105,8 @@ vec3 calcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir) {
     if(theta > light.cutOff)
     {
         float diff = max(dot(normal, lightDir), 0.0);
-        //vec3 reflectDir = reflect(-lightDir, normal);
         vec3 halfwayDir = normalize(viewDir + lightDir);
         float spec = pow(max(dot(halfwayDir, normal), 0), 256.0);
-        //float spec = pow(max(dot(viewDir, reflectDir), 0.0), 64.0);
         float distance = length(light.position - fragPos);
         float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * distance * distance);
 
