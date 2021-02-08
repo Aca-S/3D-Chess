@@ -14,6 +14,7 @@
 #include "../classes/PointLight.h"
 #include "../classes/SpotLight.h"
 #include "../classes/Material.h"
+#include "../classes/MaterialColor.h"
 #include "../classes/Cube.h"
 #include "../classes/Skybox.h"
 
@@ -41,7 +42,7 @@ std::pair<int, int> currentlyActiveRealPos;
 std::pair<int, int> boardCursor = std::make_pair(6, 1);
 
 void createChessBoard();
-void drawChessBoard(Shader &shader);
+void drawChessBoard(Shader &shader, MaterialColor &white, MaterialColor &black);
 void destroyChessBoard();
 
 int main() {
@@ -83,6 +84,14 @@ int main() {
     Texture2D checkerSpecTex("../resources/textures/chess_board_specular.jpg", SPECULAR, GL_REPEAT, GL_LINEAR);
 
     Material boardMaterial(&checkerDifTex, &checkerSpecTex, 256.0f);
+    MaterialColor figureMaterialWhite(glm::vec3(1.0f, 1.0f, 1.0f),
+                                 glm::vec3(1.0f, 1.0f, 1.0f),
+                                 glm::vec3(1.0f, 1.0f, 1.0f),
+                                 256.0f);
+    MaterialColor figureMaterialBlack(glm::vec3(0.1f, 0.1f, 0.1f),
+                                      glm::vec3(0.15f, 0.15f, 0.15f),
+                                      glm::vec3(1.0f, 1.0f, 1.0f),
+                                      256.0f);
 
     DirectionalLight directionalLight(glm::vec3(3.0f, -3.0f, 3.0f),
                                       glm::vec3(0.1, 0.1, 0.1),
@@ -173,10 +182,11 @@ int main() {
         modelShader.setUniformMatrix4fv("view", view);
         modelShader.setUniformMatrix4fv("projection", projection);
         modelShader.setUniform3fv("viewPosition", camera.Position);
+        figureMaterialWhite.activate(modelShader);
         pointLight.activate(modelShader);
         directionalLight.activate(modelShader);
         spotLight.activate(modelShader);
-        drawChessBoard(modelShader);
+        drawChessBoard(modelShader, figureMaterialWhite, figureMaterialBlack);
 
         glDepthMask(GL_FALSE);
         glDepthFunc(GL_LEQUAL);
@@ -345,13 +355,13 @@ void createChessBoard() {
     chessBoard[4][7] = new ChessFigure(king, std::make_pair(4, 7), KING, WHITE);
 }
 
-void drawChessBoard(Shader &shader) {
+void drawChessBoard(Shader &shader, MaterialColor &white, MaterialColor &black) {
     for(int i = 0; i < 8; i++)
     {
         for (int j = 0; j < 8; j++)
         {
             if (chessBoard[i][j] != nullptr)
-                chessBoard[i][j]->draw(shader);
+                chessBoard[i][j]->draw(shader, white, black);
         }
     }
 }

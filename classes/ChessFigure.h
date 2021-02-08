@@ -7,6 +7,7 @@
 
 #include "Model.h"
 #include "Shader.h"
+#include "MaterialColor.h"
 
 enum type {
     PAWN,
@@ -28,14 +29,14 @@ enum status {
 };
 
 class ChessFigure {
-    type figure_type;
-    color figure_color;
 public:
     Model *model;
     std::pair<int, int> position; // [0][0] is top left of the board
     status figure_status = INACTIVE;
+    type figure_type;
+    color figure_color;
     ChessFigure(Model *model, std::pair<int, int> position, type figure_type, color figure_color);
-    void draw(Shader &shader);
+    void draw(Shader &shader, MaterialColor &white, MaterialColor &black);
 };
 
 
