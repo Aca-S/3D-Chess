@@ -3,18 +3,19 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <set>
 
 #include "../classes/Shader.h"
 #include "../classes/Texture2D.h"
 #include "../classes/Camera.h"
 #include "../classes/Model.h"
+#include "../classes/Material.h"
+#include "../classes/MaterialColor.h"
 #include "../classes/ChessFigure.h"
 #include "../classes/ChessBoard.h"
 #include "../classes/DirectionalLight.h"
 #include "../classes/PointLight.h"
 #include "../classes/SpotLight.h"
-#include "../classes/Material.h"
-#include "../classes/MaterialColor.h"
 #include "../classes/Cube.h"
 #include "../classes/Skybox.h"
 
@@ -41,7 +42,7 @@ ChessFigure *currentlyActive = nullptr;
 std::pair<int, int> currentlyActiveRealPos;
 std::pair<int, int> boardCursor = std::make_pair(6, 1);
 
-void createChessBoard();
+void createChessBoard(Model *pawn, Model *rook, Model *knight, Model *bishop, Model *queen, Model *king);
 void drawChessBoard(Shader &shader, MaterialColor &white, MaterialColor &black);
 void destroyChessBoard();
 
@@ -74,7 +75,7 @@ int main() {
         glfwTerminate();
         return -1;
     }
-
+    
     Shader boardShader("../resources/shaders/board_vertex_shader.vs", "../resources/shaders/board_fragment_shader.fs");
     Shader lightcubeShader("../resources/shaders/lightcube_vertex_shader.vs", "../resources/shaders/lightcube_fragment_shader.fs");
     Shader modelShader("../resources/shaders/chess_piece_vertex_shader.vs", "../resources/shaders/chess_piece_fragment_shader.fs");
@@ -111,6 +112,13 @@ int main() {
                         glm::vec3(1.0f, 1.0f, 1.0f),
                         7.5f,1.0f, 0.09f, 0.032f);
 
+    Model pawn("../resources/models/chess/pawn/pawn.obj");
+    Model rook("../resources/models/chess/rook/rook.obj");
+    Model knight("../resources/models/chess/knight/knight.obj");
+    Model bishop("../resources/models/chess/bishop/bishop.obj");
+    Model queen("../resources/models/chess/queen/queen.obj");
+    Model king("../resources/models/chess/king/king.obj");
+
     std::vector<std::string> skyboxFaces = {
             "../resources/skybox/right.jpg",
             "../resources/skybox/left.jpg",
@@ -126,7 +134,7 @@ int main() {
     Cube cubeSource;
     ChessBoard board;
 
-    createChessBoard();
+    createChessBoard(&pawn, &rook, &knight, &bishop, &queen, &king);
 
     while(!glfwWindowShouldClose(window))
     {
@@ -287,6 +295,7 @@ void key_cb(GLFWwindow *window, int key, int scancode, int action, int mods) {
     {
         int i = boardCursor.second;
         int j = boardCursor.first;
+        // If there's an active chess figure and the square isn't occupied, place the chess figure on it
         if(currentlyActive != nullptr && chessBoard[i][j] == nullptr)
         {
             chessBoard[currentlyActiveRealPos.first][currentlyActiveRealPos.second] = nullptr;
@@ -294,11 +303,27 @@ void key_cb(GLFWwindow *window, int key, int scancode, int action, int mods) {
             currentlyActive->figure_status = INACTIVE;
             currentlyActive = nullptr;
         }
+        // If we're returning the active chess figure to its original square, just drop it
+        else if(currentlyActive != nullptr && i == currentlyActiveRealPos.first && j == currentlyActiveRealPos.second)
+        {
+            currentlyActive->figure_status = INACTIVE;
+            currentlyActive = nullptr;
+        }
+        // If we don't have an active chess figure and there is a figure on the selected square, pick it up
         else if(currentlyActive == nullptr && chessBoard[i][j] != nullptr)
         {
             currentlyActive = chessBoard[i][j];
             currentlyActive->figure_status = ACTIVE;
             currentlyActiveRealPos = std::make_pair(i, j);
+        }
+        // If we can capture the figure, delete it and move the active figure to its spot
+        else if(currentlyActive != nullptr && chessBoard[i][j] != nullptr && currentlyActive->figure_color != chessBoard[i][j]->figure_color)
+        {
+            chessBoard[currentlyActiveRealPos.first][currentlyActiveRealPos.second] = nullptr;
+            delete chessBoard[i][j];
+            chessBoard[i][j] = currentlyActive;
+            currentlyActive->figure_status = INACTIVE;
+            currentlyActive = nullptr;
         }
     }
 }
@@ -324,14 +349,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
     camera.ProcessMouseScroll(yoffset);
 }
 
-void createChessBoard() {
-    Model *pawn = new Model("../resources/models/chess/pawn/pawn.obj");
-    Model *rook = new Model("../resources/models/chess/rook/rook.obj");
-    Model *knight = new Model("../resources/models/chess/knight/knight.obj");
-    Model *bishop = new Model("../resources/models/chess/bishop/bishop.obj");
-    Model *queen = new Model("../resources/models/chess/queen/queen.obj");
-    Model *king = new Model("../resources/models/chess/king/king.obj");
-
+void createChessBoard(Model *pawn, Model *rook, Model *knight, Model *bishop, Model *queen, Model *king) {
     for(int i = 0; i < 8; i++)
         chessBoard[i][1] = new ChessFigure(pawn, std::make_pair(i, 1), PAWN, BLACK);
     chessBoard[0][0] = new ChessFigure(rook, std::make_pair(0, 0), ROOK, BLACK);
@@ -373,7 +391,6 @@ void destroyChessBoard() {
         {
             if(chessBoard[i][j] != nullptr)
             {
-                //delete chessBoard[i][j]->model;
                 delete chessBoard[i][j];
                 chessBoard[i][j] = nullptr;
             }
