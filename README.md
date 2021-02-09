@@ -9,3 +9,4 @@ Aleksandar Stefanović - mi18227
 | WASD and mouse | Camera |
 | Arrow keys | Figure selection cursor |
 | Space | Pick up or drop figure |
+| Escape | Close the window |
