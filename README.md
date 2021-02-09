@@ -1,5 +1,5 @@
 # 3D-Chess
-Computer graphics course project showcasing an interactable chess board.
+Computer graphics course project showcasing an interactive chess board.
 
 Aleksandar Stefanović - mi18227
 
