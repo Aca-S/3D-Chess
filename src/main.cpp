@@ -3,7 +3,6 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <set>
 
 #include "../classes/Shader.h"
 #include "../classes/Texture2D.h"
@@ -71,11 +70,11 @@ int main() {
 
     if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
-        std::cerr << "Window creation failed" << std::endl;
+        std::cerr << "GLAD initialization failed" << std::endl;
         glfwTerminate();
         return -1;
     }
-    
+
     Shader boardShader("../resources/shaders/board_vertex_shader.vs", "../resources/shaders/board_fragment_shader.fs");
     Shader lightcubeShader("../resources/shaders/lightcube_vertex_shader.vs", "../resources/shaders/lightcube_fragment_shader.fs");
     Shader modelShader("../resources/shaders/chess_piece_vertex_shader.vs", "../resources/shaders/chess_piece_fragment_shader.fs");
