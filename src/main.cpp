@@ -8,15 +8,12 @@
 #include "../classes/Texture2D.h"
 #include "../classes/Camera.h"
 #include "../classes/Model.h"
-#include "../classes/Material.h"
-#include "../classes/MaterialColor.h"
 #include "../classes/ChessFigure.h"
 #include "../classes/ChessBoard.h"
-#include "../classes/DirectionalLight.h"
-#include "../classes/PointLight.h"
-#include "../classes/SpotLight.h"
 #include "../classes/Cube.h"
 #include "../classes/Skybox.h"
+#include "../classes/lights.h"
+#include "../classes/materials.h"
 
 void framebuffer_size_cb(GLFWwindow *window, int width, int height);
 void key_cb(GLFWwindow *window, int key, int scancode, int action, int mods);
@@ -83,15 +80,14 @@ int main() {
     Texture2D checkerDifTex("../resources/textures/chess_board_diffuse.jpg", DIFFUSE, GL_REPEAT, GL_LINEAR);
     Texture2D checkerSpecTex("../resources/textures/chess_board_specular.jpg", SPECULAR, GL_REPEAT, GL_LINEAR);
 
-    Material boardMaterial(&checkerDifTex, &checkerSpecTex, 256.0f);
-    MaterialColor figureMaterialWhite(glm::vec3(1.0f, 1.0f, 1.0f),
+    MaterialTexture boardMaterial(256.0f, checkerDifTex, checkerSpecTex);
+    MaterialColor figureMaterialWhite(256.0f,
                                       glm::vec3(1.0f, 1.0f, 1.0f),
                                       glm::vec3(1.0f, 1.0f, 1.0f),
-                                      256.0f);
-    MaterialColor figureMaterialBlack(glm::vec3(0.1f, 0.1f, 0.1f),
+                                      glm::vec3(1.0f, 1.0f, 1.0f));
+    MaterialColor figureMaterialBlack(256.0f, glm::vec3(0.1f, 0.1f, 0.1f),
                                       glm::vec3(0.15f, 0.15f, 0.15f),
-                                      glm::vec3(1.0f, 1.0f, 1.0f),
-                                      256.0f);
+                                      glm::vec3(1.0f, 1.0f, 1.0f));
 
     DirectionalLight directionalLight(glm::vec3(0.1, 0.1, 0.1),
                                       glm::vec3(0.3f, 0.3f, 0.3f),
@@ -179,7 +175,7 @@ int main() {
         model = glm::rotate(model, (float)glm::radians(90.0), glm::vec3(0.0f, 0.0f, 1.0f));
         model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
         boardShader.setUniformMatrix4fv("model", model);
-        boardMaterial.activate(boardShader);
+        boardMaterial.activate(boardShader, "material");
         pointLight.activate(boardShader, "pointLight");
         directionalLight.activate(boardShader, "directionalLight");
         spotLight.activate(boardShader, "spotLight");
@@ -189,7 +185,6 @@ int main() {
         modelShader.setUniformMatrix4fv("view", view);
         modelShader.setUniformMatrix4fv("projection", projection);
         modelShader.setUniform3fv("viewPosition", camera.Position);
-        figureMaterialWhite.activate(modelShader);
         pointLight.activate(modelShader, "pointLight");
         directionalLight.activate(modelShader, "directionalLight");
         spotLight.activate(modelShader, "spotLight");

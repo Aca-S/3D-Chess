@@ -4,16 +4,12 @@
 
 #include "MaterialColor.h"
 
-MaterialColor::MaterialColor(const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular, float shininess) {
-    this->ambient = ambient;
-    this->diffuse = diffuse;
-    this->specular = specular;
-    this->shininess = shininess;
-}
+MaterialColor::MaterialColor(float shininess, const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular)
+    : Material{shininess}, ambient{ambient}, diffuse{diffuse}, specular{specular} { }
 
-void MaterialColor::activate(Shader &shader) const {
-    shader.setUniform3fv("material.ambient", ambient);
-    shader.setUniform3fv("material.diffuse", diffuse);
-    shader.setUniform3fv("material.specular", specular);
-    shader.setUniform1f("material.shininess", shininess);
+void MaterialColor::activate(const Shader &shader, const std::string &prefix) const {
+    Material::activate(shader, prefix);
+    shader.setUniform3fv(prefix + ".ambient", ambient);
+    shader.setUniform3fv(prefix + ".diffuse", diffuse);
+    shader.setUniform3fv(prefix + ".specular", specular);
 }

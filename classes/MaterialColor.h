@@ -5,19 +5,16 @@
 #ifndef RG_3D_SAH_MATERIALCOLOR_H
 #define RG_3D_SAH_MATERIALCOLOR_H
 
+#include "Material.h"
 #include <glm/glm.hpp>
 
-#include "Shader.h"
-#include "Texture2D.h"
-
-class MaterialColor {
+class MaterialColor: public Material {
     glm::vec3 ambient;
     glm::vec3 diffuse;
     glm::vec3 specular;
 public:
-    MaterialColor(const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular, float shininess);
-    void activate(Shader &shader) const;
-    float shininess;
+    MaterialColor(float shininess, const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular);
+    void activate(const Shader &shader, const std::string &prefix) const override;
 };
 
 

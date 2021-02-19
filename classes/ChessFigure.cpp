@@ -46,10 +46,10 @@ void ChessFigure::draw(Shader &shader, MaterialColor &white, MaterialColor &blac
     if(figure_color == WHITE)
     {
         model = glm::rotate(model, (float)glm::radians(180.0), glm::vec3(0.0f, 1.0f, 0.0f));
-        white.activate(shader);
+        white.activate(shader, "material");
     }
     else
-        black.activate(shader);
+        black.activate(shader, "material");
     model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));
     shader.setUniformMatrix4fv("model", model);
     this->model->draw(shader);
