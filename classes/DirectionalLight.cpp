@@ -4,16 +4,20 @@
 
 #include "DirectionalLight.h"
 
-DirectionalLight::DirectionalLight(const glm::vec3 &direction, const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular) {
-    this->direction = direction;
-    this->ambient = ambient;
-    this->diffuse = diffuse;
-    this->specular = specular;
+DirectionalLight::DirectionalLight(const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular,
+                                   const glm::vec3 &direction)
+                                   : Light{ambient, diffuse, specular},
+                                   direction{direction} { }
+
+void DirectionalLight::activate(const Shader &shader, const std::string &prefix) const {
+    Light::activate(shader, prefix);
+    shader.setUniform3fv(prefix + ".direction", direction);
 }
 
-void DirectionalLight::activate(const Shader &shader) const {
-    shader.setUniform3fv("directionalLight.direction", direction);
-    shader.setUniform3fv("directionalLight.ambient", ambient);
-    shader.setUniform3fv("directionalLight.diffuse", diffuse);
-    shader.setUniform3fv("directionalLight.specular", specular);
+const glm::vec3 &DirectionalLight::getDirection() const {
+    return direction;
+}
+
+void DirectionalLight::setDirection(const glm::vec3 &direction) {
+    DirectionalLight::direction = direction;
 }

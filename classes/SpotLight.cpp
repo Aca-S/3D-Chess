@@ -4,27 +4,67 @@
 
 #include "SpotLight.h"
 
-SpotLight::SpotLight(const glm::vec3 &position, const glm::vec3 &direction,
-          const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular,
-          float cutOff, float constant, float linear, float quadratic) {
-    this->position = position;
-    this->direction = direction;
-    this->ambient = ambient;
-    this->diffuse = diffuse;
-    this->specular = specular;
-    this->cutOff = glm::cos(glm::radians(cutOff));
-    this->constant = constant;
-    this->linear = linear;
-    this->quadratic = quadratic;
+SpotLight::SpotLight(const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular,
+                     const glm::vec3 &position, const glm::vec3 &direction,
+                     float cutOff, float constant, float linear, float quadratic)
+                     : Light{ambient, diffuse, specular},
+                     position{position}, direction{direction},
+                     cutOff{glm::cos(glm::radians(cutOff))}, constant{constant}, linear{linear}, quadratic{quadratic} { }
+
+void SpotLight::activate(const Shader &shader, const std::string &prefix) const {
+    Light::activate(shader, prefix);
+    shader.setUniform3fv(prefix + ".position", position);
+    shader.setUniform3fv(prefix + ".direction", direction);
+    shader.setUniform1f(prefix + ".cutOff", cutOff);
+    shader.setUniform1f(prefix + ".constant", constant);
+    shader.setUniform1f(prefix + ".linear", linear);
+    shader.setUniform1f(prefix + ".quadratic", quadratic);
 }
-void SpotLight::activate(const Shader &shader) const {
-    shader.setUniform3fv("spotLight.position", position);
-    shader.setUniform3fv("spotLight.direction", direction);
-    shader.setUniform3fv("spotLight.ambient", ambient);
-    shader.setUniform3fv("spotLight.diffuse", diffuse);
-    shader.setUniform3fv("spotLight.specular", specular);
-    shader.setUniform1f("spotLight.cutOff", cutOff);
-    shader.setUniform1f("spotLight.constant", constant);
-    shader.setUniform1f("spotLight.linear", linear);
-    shader.setUniform1f("spotLight.quadratic", quadratic);
+
+const glm::vec3 &SpotLight::getPosition() const {
+    return position;
+}
+
+void SpotLight::setPosition(const glm::vec3 &position) {
+    SpotLight::position = position;
+}
+
+const glm::vec3 &SpotLight::getDirection() const {
+    return direction;
+}
+
+void SpotLight::setDirection(const glm::vec3 &direction) {
+    SpotLight::direction = direction;
+}
+
+float SpotLight::getCutOff() const {
+    return cutOff;
+}
+
+void SpotLight::setCutOff(float cutOff) {
+    SpotLight::cutOff = cutOff;
+}
+
+float SpotLight::getConstant() const {
+    return constant;
+}
+
+void SpotLight::setConstant(float constant) {
+    SpotLight::constant = constant;
+}
+
+float SpotLight::getLinear() const {
+    return linear;
+}
+
+void SpotLight::setLinear(float linear) {
+    SpotLight::linear = linear;
+}
+
+float SpotLight::getQuadratic() const {
+    return quadratic;
+}
+
+void SpotLight::setQuadratic(float quadratic) {
+    SpotLight::quadratic = quadratic;
 }

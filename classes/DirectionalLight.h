@@ -5,19 +5,18 @@
 #ifndef RG_3D_SAH_DIRECTIONALLIGHT_H
 #define RG_3D_SAH_DIRECTIONALLIGHT_H
 
-#include <glm/glm.hpp>
+#include "Light.h"
 
-#include "Shader.h"
-
-class DirectionalLight {
-public:
-    DirectionalLight(const glm::vec3 &direction, const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular);
-    void activate(const Shader &shader) const;
-
+class DirectionalLight: public Light {
     glm::vec3 direction;
-    glm::vec3 ambient;
-    glm::vec3 diffuse;
-    glm::vec3 specular;
+public:
+    DirectionalLight(const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular,
+                     const glm::vec3 &direction);
+    void activate(const Shader &shader, const std::string &prefix) const override;
+
+    const glm::vec3 &getDirection() const;
+
+    void setDirection(const glm::vec3 &direction);
 };
 
 

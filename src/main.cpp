@@ -85,30 +85,30 @@ int main() {
 
     Material boardMaterial(&checkerDifTex, &checkerSpecTex, 256.0f);
     MaterialColor figureMaterialWhite(glm::vec3(1.0f, 1.0f, 1.0f),
-                                 glm::vec3(1.0f, 1.0f, 1.0f),
-                                 glm::vec3(1.0f, 1.0f, 1.0f),
-                                 256.0f);
+                                      glm::vec3(1.0f, 1.0f, 1.0f),
+                                      glm::vec3(1.0f, 1.0f, 1.0f),
+                                      256.0f);
     MaterialColor figureMaterialBlack(glm::vec3(0.1f, 0.1f, 0.1f),
                                       glm::vec3(0.15f, 0.15f, 0.15f),
                                       glm::vec3(1.0f, 1.0f, 1.0f),
                                       256.0f);
 
-    DirectionalLight directionalLight(glm::vec3(3.0f, -3.0f, 3.0f),
-                                      glm::vec3(0.1, 0.1, 0.1),
+    DirectionalLight directionalLight(glm::vec3(0.1, 0.1, 0.1),
                                       glm::vec3(0.3f, 0.3f, 0.3f),
-                                      glm::vec3(1.0f, 1.0f, 1.0f));
+                                      glm::vec3(1.0f, 1.0f, 1.0f),
+                                      glm::vec3(3.0f, -3.0f, 3.0f));
 
-    PointLight pointLight(glm::vec3(1.75f, 3.0f, 1.75f),
-                          glm::vec3(0.2, 0.2, 0.2),
+    PointLight pointLight(glm::vec3(0.2, 0.2, 0.2),
                           glm::vec3(0.6f, 0.6f, 0.6f),
                           glm::vec3(1.0f, 1.0f, 1.0f),
+                          glm::vec3(1.75f, 3.0f, 1.75f),
                           1.0f, 0.12f, 0.082f);
 
-    SpotLight spotLight(glm::vec3(1.5f, 2.0f, 0.5f),
+    SpotLight spotLight(glm::vec3(0.1, 0.1, 0.1),
+                        glm::vec3(1.0f, 1.0f, 1.0f),
+                        glm::vec3(1.0f, 1.0f, 1.0f),
+                        glm::vec3(1.5f, 2.0f, 0.5f),
                         glm::vec3(0.0f, -1.0f, 0.0f),
-                        glm::vec3(0.1, 0.1, 0.1),
-                        glm::vec3(1.0f, 1.0f, 1.0f),
-                        glm::vec3(1.0f, 1.0f, 1.0f),
                         7.5f,1.0f, 0.09f, 0.032f);
 
     Model pawn("../resources/models/chess/pawn/pawn.obj");
@@ -163,11 +163,11 @@ int main() {
         lightcubeShader.setUniformMatrix4fv("model", model);
         cubeSource.draw();
 
-        pointLight.position = glm::vec3(1.75 + 3.0f * cos(glfwGetTime() / lightSpeedReduction), 3.0f, 1.75 + 3.0f * sin(glfwGetTime() / lightSpeedReduction));
+        pointLight.setPosition(glm::vec3(1.75 + 3.0f * cos(glfwGetTime() / lightSpeedReduction), 3.0f, 1.75 + 3.0f * sin(glfwGetTime() / lightSpeedReduction)));
 
         // Light up the currently selected field
-        spotLight.position = glm::vec3(boardCursor.second * 0.5f, 2.0f, boardCursor.first * 0.5f);
-        spotLight.diffuse = glm::vec3((sin(glfwGetTime()) + 1) / 2, 0.5, 0.1);
+        spotLight.setPosition(glm::vec3(boardCursor.second * 0.5f, 2.0f, boardCursor.first * 0.5f));
+        spotLight.setDiffuse(glm::vec3((sin(glfwGetTime()) + 1) / 2, 0.5, 0.1));
 
         boardShader.use();
         boardShader.setUniformMatrix4fv("view", view);
@@ -180,9 +180,9 @@ int main() {
         model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
         boardShader.setUniformMatrix4fv("model", model);
         boardMaterial.activate(boardShader);
-        pointLight.activate(boardShader);
-        directionalLight.activate(boardShader);
-        spotLight.activate(boardShader);
+        pointLight.activate(boardShader, "pointLight");
+        directionalLight.activate(boardShader, "directionalLight");
+        spotLight.activate(boardShader, "spotLight");
         board.draw();
 
         modelShader.use();
@@ -190,9 +190,9 @@ int main() {
         modelShader.setUniformMatrix4fv("projection", projection);
         modelShader.setUniform3fv("viewPosition", camera.Position);
         figureMaterialWhite.activate(modelShader);
-        pointLight.activate(modelShader);
-        directionalLight.activate(modelShader);
-        spotLight.activate(modelShader);
+        pointLight.activate(modelShader, "pointLight");
+        directionalLight.activate(modelShader, "directionalLight");
+        spotLight.activate(modelShader, "spotLight");
         drawChessBoard(modelShader, figureMaterialWhite, figureMaterialBlack);
 
         glDepthMask(GL_FALSE);
