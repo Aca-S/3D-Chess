@@ -4,12 +4,37 @@
 
 #include "Mesh.h"
 
-Mesh::Mesh(std::vector<Vertex> &vertices, std::vector<unsigned> &indices, std::vector<Texture2D> &textures) {
-    this->vertices = vertices;
-    this->indices = indices;
-    this->textures = textures;
-    setupMesh();
+Mesh::Mesh(std::vector<Vertex> &vertices, std::vector<unsigned> &indices, std::vector<Texture2D> &textures)
+    : vertices{vertices}, indices{indices}, textures{textures} {
+        setupMesh();
+    }
+
+static std::vector<Vertex> rawToVertices(float *verticesRaw, int numOfVertices) {
+    std::vector<Vertex> vertices(numOfVertices);
+    for(int i = 0; i < numOfVertices; i++)
+    {
+        int baseIndex = i * 14;
+        vertices[i].position = glm::vec3(verticesRaw[baseIndex], verticesRaw[baseIndex + 1], verticesRaw[baseIndex + 2]);
+        vertices[i].normal = glm::vec3(verticesRaw[baseIndex + 3], verticesRaw[baseIndex + 4], verticesRaw[baseIndex + 5]);
+        vertices[i].texCoords = glm::vec2(verticesRaw[baseIndex + 6], verticesRaw[baseIndex + 7]);
+        vertices[i].tangent = glm::vec3(verticesRaw[baseIndex + 8], verticesRaw[baseIndex + 9], verticesRaw[baseIndex + 10]);
+        vertices[i].bitangent = glm::vec3(verticesRaw[baseIndex + 11], verticesRaw[baseIndex + 12], verticesRaw[baseIndex + 13]);
+    }
+    return vertices;
 }
+
+static std::vector<unsigned> rawToIndices(unsigned *indicesRaw, int numOfIndices) {
+    std::vector<unsigned> indices(numOfIndices);
+    for(int i = 0; i < numOfIndices; i++)
+        indices[i] = indicesRaw[i];
+    return indices;
+}
+
+Mesh::Mesh(float *vertices, int numOfVertices, unsigned *indices, int numOfIndices, MaterialTexture &material)
+    : vertices{rawToVertices(vertices, numOfVertices)}, indices{rawToIndices(indices, numOfIndices)} {
+        Mesh::textures.push_back(material.getDiffuse());
+        Mesh::textures.push_back(material.getSpecular());
+    }
 
 void Mesh::draw(Shader &shader) {
     int diffuseNr = 1;

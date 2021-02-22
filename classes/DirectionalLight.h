@@ -10,8 +10,11 @@
 class DirectionalLight: public Light {
     glm::vec3 direction;
 public:
+    DirectionalLight(const std::string &prefix, const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular,
+                     const glm::vec3 &direction);
     DirectionalLight(const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular,
                      const glm::vec3 &direction);
+    void activate(const Shader &shader) const override;
     void activate(const Shader &shader, const std::string &prefix) const override;
 
     const glm::vec3 &getDirection() const;

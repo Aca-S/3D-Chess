@@ -9,11 +9,11 @@
 #include "../classes/Camera.h"
 #include "../classes/Model.h"
 #include "../classes/ChessFigure.h"
-#include "../classes/ChessBoard.h"
-#include "../classes/Cube.h"
 #include "../classes/Skybox.h"
 #include "../classes/lights.h"
 #include "../classes/materials.h"
+#include "../classes/Scene.h"
+#include "../classes/RawMesh.h"
 
 void framebuffer_size_cb(GLFWwindow *window, int width, int height);
 void key_cb(GLFWwindow *window, int key, int scancode, int action, int mods);
@@ -89,18 +89,21 @@ int main() {
                                       glm::vec3(0.15f, 0.15f, 0.15f),
                                       glm::vec3(1.0f, 1.0f, 1.0f));
 
-    DirectionalLight directionalLight(glm::vec3(0.1, 0.1, 0.1),
+    DirectionalLight directionalLight("directionalLight",
+                                      glm::vec3(0.1, 0.1, 0.1),
                                       glm::vec3(0.3f, 0.3f, 0.3f),
                                       glm::vec3(1.0f, 1.0f, 1.0f),
                                       glm::vec3(3.0f, -3.0f, 3.0f));
 
-    PointLight pointLight(glm::vec3(0.2, 0.2, 0.2),
+    PointLight pointLight("pointLight",
+                          glm::vec3(0.2, 0.2, 0.2),
                           glm::vec3(0.6f, 0.6f, 0.6f),
                           glm::vec3(1.0f, 1.0f, 1.0f),
                           glm::vec3(1.75f, 3.0f, 1.75f),
                           1.0f, 0.12f, 0.082f);
 
-    SpotLight spotLight(glm::vec3(0.1, 0.1, 0.1),
+    SpotLight spotLight("spotLight",
+                        glm::vec3(0.1, 0.1, 0.1),
                         glm::vec3(1.0f, 1.0f, 1.0f),
                         glm::vec3(1.0f, 1.0f, 1.0f),
                         glm::vec3(1.5f, 2.0f, 0.5f),
@@ -126,10 +129,89 @@ int main() {
     skyboxShader.use();
     skyboxShader.setUniform1i("skybox", 0);
 
-    Cube cubeSource;
-    ChessBoard board;
-
     createChessBoard(&pawn, &rook, &knight, &bishop, &queen, &king);
+
+    Scene scene(camera);
+    scene.addLight(&directionalLight, &boardShader);
+    scene.addLight(&directionalLight, &modelShader);
+    scene.addLight(&pointLight, &boardShader);
+    scene.addLight(&pointLight, &modelShader);
+    scene.addLight(&spotLight, &boardShader);
+    scene.addLight(&spotLight, &modelShader);
+
+    float boardVertices[] = {
+            // Coords           Normals           Texture
+            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom-left
+            0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f, 4.0f, 0.0f, // bottom-right
+            -0.5f, 0.5f, 0.0f,  0.0f, 0.0f, 1.0f, 0.0f, 4.0f, // top-left
+            0.5f, 0.5f, 0.0f,   0.0f, 0.0f, 1.0f, 4.0f, 4.0f  // top-right
+    };
+
+    unsigned boardIndices[] = {
+            0, 1, 2,
+            1, 2, 3
+    };
+
+    float cubeVertices[] = {
+            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+            0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+            0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+            0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+            -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+
+            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+            0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+            0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+            0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+            -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+
+            -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+            -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+            -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+            -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+            -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+            -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+
+            0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+            0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+            0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+            0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+            0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+            0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+
+            -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+            0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+            0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+            0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+
+            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+            0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+            0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+            0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+            -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
+    };
+
+    RawMesh brd(boardVertices, 4, sizeof(boardVertices), boardIndices, 6, boardMaterial);
+    RawMesh cub(cubeVertices, 36, sizeof(cubeVertices), figureMaterialWhite);
+
+    glm::mat4 boardTransform = glm::mat4(1.0);
+    boardTransform = glm::translate(boardTransform, glm::vec3(1.75f, 0.0f, 1.75f));
+    boardTransform = glm::rotate(boardTransform, (float)glm::radians(270.0), glm::vec3(1.0f, 0.0f, 0.0f));
+    boardTransform = glm::rotate(boardTransform, (float)glm::radians(90.0), glm::vec3(0.0f, 0.0f, 1.0f));
+    boardTransform = glm::scale(boardTransform, glm::vec3(4.0f, 4.0f, 4.0f));
+
+    glm::mat4 cubeTransform = glm::mat4(1.0);
+
+    scene.addRawMesh(&brd, &boardShader, &boardTransform);
+    scene.addRawMesh(&cub, &lightcubeShader, &cubeTransform);
+
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glEnable(GL_DEPTH_TEST);
 
     while(!glfwWindowShouldClose(window))
     {
@@ -149,15 +231,10 @@ int main() {
         projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / SCR_HEIGHT, 0.1f, 100.0f);
 
         float lightSpeedReduction = 5;
-        lightcubeShader.use();
-        lightcubeShader.setUniformMatrix4fv("view", view);
-        lightcubeShader.setUniformMatrix4fv("projection", projection);
-        model = glm::mat4(1.0);
-        model = glm::translate(model, glm::vec3(1.75f + 3.0 * cos(glfwGetTime() / lightSpeedReduction), 3.0f, 1.75f + 3.0 * sin(glfwGetTime() / lightSpeedReduction))); // m * T
-        model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f)); // m * T * R
-        model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f)); // m * T * R * S
-        lightcubeShader.setUniformMatrix4fv("model", model);
-        cubeSource.draw();
+        cubeTransform = glm::mat4(1.0);
+        cubeTransform = glm::translate(cubeTransform, glm::vec3(1.75f + 3.0 * cos(glfwGetTime() / lightSpeedReduction), 3.0f, 1.75f + 3.0 * sin(glfwGetTime() / lightSpeedReduction))); // m * T
+        cubeTransform = glm::rotate(cubeTransform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f)); // m * T * R
+        cubeTransform = glm::scale(cubeTransform, glm::vec3(0.2f, 0.2f, 0.2f)); // m * T * R * S
 
         pointLight.setPosition(glm::vec3(1.75 + 3.0f * cos(glfwGetTime() / lightSpeedReduction), 3.0f, 1.75 + 3.0f * sin(glfwGetTime() / lightSpeedReduction)));
 
@@ -165,29 +242,12 @@ int main() {
         spotLight.setPosition(glm::vec3(boardCursor.second * 0.5f, 2.0f, boardCursor.first * 0.5f));
         spotLight.setDiffuse(glm::vec3((sin(glfwGetTime()) + 1) / 2, 0.5, 0.1));
 
-        boardShader.use();
-        boardShader.setUniformMatrix4fv("view", view);
-        boardShader.setUniformMatrix4fv("projection", projection);
-        boardShader.setUniform3fv("viewPosition", camera.Position);
-        model = glm::mat4(1.0);
-        model = glm::translate(model, glm::vec3(1.75f, 0.0f, 1.75f));
-        model = glm::rotate(model, (float)glm::radians(270.0), glm::vec3(1.0f, 0.0f, 0.0f));
-        model = glm::rotate(model, (float)glm::radians(90.0), glm::vec3(0.0f, 0.0f, 1.0f));
-        model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
-        boardShader.setUniformMatrix4fv("model", model);
-        boardMaterial.activate(boardShader, "material");
-        pointLight.activate(boardShader, "pointLight");
-        directionalLight.activate(boardShader, "directionalLight");
-        spotLight.activate(boardShader, "spotLight");
-        board.draw();
+        scene.render();
 
         modelShader.use();
         modelShader.setUniformMatrix4fv("view", view);
         modelShader.setUniformMatrix4fv("projection", projection);
         modelShader.setUniform3fv("viewPosition", camera.Position);
-        pointLight.activate(modelShader, "pointLight");
-        directionalLight.activate(modelShader, "directionalLight");
-        spotLight.activate(modelShader, "spotLight");
         drawChessBoard(modelShader, figureMaterialWhite, figureMaterialBlack);
 
         glDepthMask(GL_FALSE);
@@ -202,8 +262,6 @@ int main() {
         glfwSwapBuffers(window);
     }
 
-    cubeSource.del();
-    board.del();
     skybox.del();
 
     checkerDifTex.del();

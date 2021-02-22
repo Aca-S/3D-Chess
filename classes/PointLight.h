@@ -13,8 +13,11 @@ class PointLight: public Light {
     float linear;
     float quadratic;
 public:
+    PointLight(const std::string &prefix, const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular,
+               const glm::vec3 &position, float constant, float linear, float quadratic);
     PointLight(const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular,
                const glm::vec3 &position, float constant, float linear, float quadratic);
+    void activate(const Shader &shader) const override;
     void activate(const Shader &shader, const std::string &prefix) const override;
 
     const glm::vec3 &getPosition() const;

@@ -14,3 +14,19 @@ void MaterialTexture::activate(const Shader &shader, const std::string &prefix) 
     specular.active(GL_TEXTURE1);
     shader.setUniform1i(prefix + ".texture_specular1", 1);
 }
+
+const Texture2D &MaterialTexture::getDiffuse() const {
+    return diffuse;
+}
+
+void MaterialTexture::setDiffuse(const Texture2D &diffuse) {
+    MaterialTexture::diffuse = diffuse;
+}
+
+const Texture2D &MaterialTexture::getSpecular() const {
+    return specular;
+}
+
+void MaterialTexture::setSpecular(const Texture2D &specular) {
+    MaterialTexture::specular = specular;
+}

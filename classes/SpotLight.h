@@ -15,9 +15,13 @@ class SpotLight: public Light {
     float linear;
     float quadratic;
 public:
+    SpotLight(const std::string &prefix, const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular,
+              const glm::vec3 &position, const glm::vec3 &direction,
+              float cutOff, float constant, float linear, float quadratic);
     SpotLight(const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular,
               const glm::vec3 &position, const glm::vec3 &direction,
               float cutOff, float constant, float linear, float quadratic);
+    void activate(const Shader &shader) const override;
     void activate(const Shader &shader, const std::string &prefix) const override;
 
     const glm::vec3 &getPosition() const;

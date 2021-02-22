@@ -7,12 +7,9 @@
 
 #include "Shader.h"
 
-class ChessBoard {
-    unsigned VBO, VAO, EBO;
+class ChessBoard: public RawMesh {
 public:
     ChessBoard();
-    void draw();
-    void del();
 };
 
 

@@ -15,6 +15,18 @@ class MaterialColor: public Material {
 public:
     MaterialColor(float shininess, const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular);
     void activate(const Shader &shader, const std::string &prefix) const override;
+
+    const glm::vec3 &getAmbient() const;
+
+    void setAmbient(const glm::vec3 &ambient);
+
+    const glm::vec3 &getDiffuse() const;
+
+    void setDiffuse(const glm::vec3 &diffuse);
+
+    const glm::vec3 &getSpecular() const;
+
+    void setSpecular(const glm::vec3 &specular);
 };
 
 

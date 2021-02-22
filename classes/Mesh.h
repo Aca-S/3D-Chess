@@ -10,6 +10,7 @@
 
 #include "Shader.h"
 #include "Texture2D.h"
+#include "materials.h"
 
 struct Vertex {
     glm::vec3 position;
@@ -27,6 +28,7 @@ public:
     std::vector<unsigned> indices;
     std::vector<Texture2D> textures;
     Mesh(std::vector<Vertex> &vertices, std::vector<unsigned> &indices, std::vector<Texture2D> &textures);
+    Mesh(float *vertices, int numOfVertices, unsigned *indices, int numOfIndices, MaterialTexture &material);
     void draw(Shader &shader);
 };
 

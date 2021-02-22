@@ -9,12 +9,19 @@
 #include "Shader.h"
 
 class Light {
+    std::string prefix;
     glm::vec3 ambient;
     glm::vec3 diffuse;
     glm::vec3 specular;
 public:
+    Light(const std::string &prefix, const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular);
     Light(const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular);
+    virtual void activate(const Shader &shader) const = 0;
     virtual void activate(const Shader &shader, const std::string &prefix) const = 0;
+
+    const std::string &getPrefix() const;
+
+    void setPrefix(const std::string &prefix);
 
     const glm::vec3 &getAmbient() const;
 

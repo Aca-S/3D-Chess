@@ -4,10 +4,23 @@
 
 #include "PointLight.h"
 
+PointLight::PointLight(const std::string &prefix, const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular,
+                       const glm::vec3 &position, float constant, float linear, float quadratic)
+                       : Light{prefix, ambient, diffuse, specular},
+                       position{position}, constant{constant}, linear{linear}, quadratic{quadratic} { }
+
 PointLight::PointLight(const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular,
                        const glm::vec3 &position, float constant, float linear, float quadratic)
                        : Light{ambient, diffuse, specular},
                        position{position}, constant{constant}, linear{linear}, quadratic{quadratic} { }
+
+void PointLight::activate(const Shader &shader) const {
+    Light::activate(shader);
+    shader.setUniform3fv(Light::getPrefix() + ".position", position);
+    shader.setUniform1f(Light::getPrefix() + ".constant", constant);
+    shader.setUniform1f(Light::getPrefix() + ".linear", linear);
+    shader.setUniform1f(Light::getPrefix() + ".quadratic", quadratic);
+}
 
 void PointLight::activate(const Shader &shader, const std::string &prefix) const {
     Light::activate(shader, prefix);

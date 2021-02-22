@@ -11,7 +11,11 @@ class Material {
     float shininess;
 public:
     explicit Material(float shininess);
-    virtual void activate(const Shader &shader, const std::string &prefix) const = 0;
+    virtual void activate(const Shader &shader, const std::string &prefix) const;
+
+    float getShininess() const;
+
+    void setShininess(float shininess);
 };
 
 

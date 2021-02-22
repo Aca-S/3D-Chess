@@ -15,6 +15,14 @@ class MaterialTexture: public Material {
 public:
     MaterialTexture(float shininess, const Texture2D &diffuse, const Texture2D &specular);
     void activate(const Shader &shader, const std::string &prefix) const override;
+
+    const Texture2D &getDiffuse() const;
+
+    void setDiffuse(const Texture2D &diffuse);
+
+    const Texture2D &getSpecular() const;
+
+    void setSpecular(const Texture2D &specular);
 };
 
 

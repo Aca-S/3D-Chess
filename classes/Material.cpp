@@ -10,3 +10,11 @@ Material::Material(float shininess)
 void Material::activate(const Shader &shader, const std::string &prefix) const {
     shader.setUniform1f(prefix + ".shininess", shininess);
 }
+
+float Material::getShininess() const {
+    return shininess;
+}
+
+void Material::setShininess(float shininess) {
+    Material::shininess = shininess;
+}
